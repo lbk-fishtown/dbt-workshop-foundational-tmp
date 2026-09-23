@@ -9,3 +9,26 @@ sources:
         description: "One record per customer"
       - name: lineitem
         description: "One record per line item within a single order (1 -> n)"
+      - name: part
+        description: "One record per product part"
+        columns:
+          - name: p_partkey
+            description: "Primary key for the part"
+            data_tests:
+              - unique
+              - not_null
+      - name: partsupp
+        description: "One record per part and supplier combination"
+        columns:
+          - name: ps_partkey
+            description: "Foreign key to the part"
+            data_tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('tpch', 'part')
+                    field: p_partkey
+          - name: ps_suppkey
+            description: "Foreign key to the supplier"
+            data_tests:
+              - not_null

@@ -1,0 +1,51 @@
+models:
+  - name: part_margins
+    description: >
+      Product margins at one row per part. Unit margin uses quantity-weighted
+      average supplier cost; total margin sums inventory margin across suppliers.
+    columns:
+      - name: part_key
+        description: "Primary key for the part"
+        data_tests:
+          - unique
+          - not_null
+      - name: total_quantity
+        description: "Available quantity summed across all suppliers for the part"
+        data_tests:
+          - not_null
+      - name: weighted_average_unit_cost
+        description: "Supplier unit cost weighted by each supplier's available quantity"
+        data_tests:
+          - not_null
+      - name: unit_margin
+        description: "Retail price less weighted-average unit cost"
+        data_tests:
+          - not_null
+      - name: total_margin
+        description: "Sum of unit margin times available quantity across suppliers"
+        data_tests:
+          - not_null
+      - name: unit_margin_rank
+        description: "Descending product rank by unit margin across all parts"
+        data_tests:
+          - unique
+          - not_null
+      - name: total_margin_rank
+        description: "Descending product rank by total margin across all parts"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: top_part_margins
+    description: "The 50 parts with the highest total inventory margin"
+    columns:
+      - name: part_key
+        description: "Primary key for the part"
+        data_tests:
+          - unique
+          - not_null
+      - name: total_margin_rank
+        description: "Descending product rank by total margin across all parts"
+        data_tests:
+          - unique
+          - not_null
