@@ -7,4 +7,4 @@ models:
     description: The month in which the order was placed.
     data_tests:
       - not_null
-  - name: market_segment  
+  - name: market_segment
