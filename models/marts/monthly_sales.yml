@@ -1,10 +1,26 @@
 models:
-- name: monthly_sales
-  description: This model aggregates sales data on a monthly basis, providing insights
-    into total revenue generated per market segment each month.
-  columns:
-  - name: order_month
-    description: The month in which the order was placed.
+  - name: monthly_sales
+    description: >-
+      Monthly gross item sales summarized by customer market segment for sales
+      reporting. One row per order month and market segment; only orders with
+      matching line items and customers are included through `fct_orders`.
     data_tests:
-      - not_null
-  - name: market_segment
+      - unique:
+          name: unique_monthly_sales_order_month_market_segment
+          arguments:
+            column_name: "(order_month || '|' || market_segment)"
+    columns:
+      - name: order_month
+        description: The calendar month of the order, truncated to the first day of the month.
+        data_tests:
+          - not_null
+
+      - name: market_segment
+        description: The customer market segment associated with the order.
+        data_tests:
+          - not_null
+
+      - name: total_revenue
+        description: Total gross item sales amount for the order month and market segment.
+        data_tests:
+          - not_null

@@ -1,0 +1,38 @@
+models:
+  - name: top_50_part_margins
+    description: >-
+      The 50 parts with the highest total available margin across suppliers.
+      One row per part. Unit cost is weighted by available quantity so total
+      margin equals unit margin multiplied by total available quantity.
+    columns:
+      - name: part_key
+        description: The unique identifier for the part.
+        data_tests:
+          - unique
+          - not_null
+
+      - name: total_quantity
+        description: Total available quantity for the part across all suppliers.
+        data_tests:
+          - not_null
+
+      - name: unit_margin
+        description: Retail price minus quantity-weighted unit supply cost.
+        data_tests:
+          - not_null
+
+      - name: total_margin
+        description: Unit margin multiplied by total available quantity.
+        data_tests:
+          - not_null
+
+      - name: unit_margin_rank
+        description: Part rank by unit margin in descending order.
+        data_tests:
+          - not_null
+
+      - name: total_margin_rank
+        description: Deterministic part rank by total margin in descending order.
+        data_tests:
+          - unique
+          - not_null
