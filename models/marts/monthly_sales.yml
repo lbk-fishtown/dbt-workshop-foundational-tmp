@@ -1,0 +1,53 @@
+models:
+  - name: monthly_sales
+    description: >
+      Aggregates sales to one row per order month and market segment, with total
+      gross revenue for that grain.
+    data_tests:
+      - unique:
+          arguments:
+            column_name: "hash(order_month, market_segment)"
+    columns:
+      - name: order_month
+        description: The first day of the month in which the orders were placed.
+        data_tests:
+          - not_null
+
+      - name: market_segment
+        description: The customer market segment associated with the orders.
+        data_tests:
+          - not_null
+
+      - name: total_revenue
+        description: Total gross item sales amount for the month and market segment.
+        data_tests:
+          - not_null
+
+unit_tests:
+  - name: monthly_sales_aggregates_at_month_and_segment_grain
+    description: >
+      Aggregates repeated rows within a month and segment while keeping different
+      segments, months, and years separate. A zero-value row does not change the total.
+    model: monthly_sales
+    given:
+      - input: ref('fct_orders')
+        rows:
+          - {order_date: '2023-12-01', market_segment: AUTOMOBILE, gross_item_sales_amount: 100}
+          - {order_date: '2023-12-31', market_segment: AUTOMOBILE, gross_item_sales_amount: 50}
+          - {order_date: '2023-12-15', market_segment: BUILDING, gross_item_sales_amount: 25}
+          - {order_date: '2024-01-01', market_segment: AUTOMOBILE, gross_item_sales_amount: 75}
+          - {order_date: '2024-01-31', market_segment: AUTOMOBILE, gross_item_sales_amount: 0}
+    expect:
+      rows:
+        - {order_month: '2023-12-01', market_segment: AUTOMOBILE, total_revenue: 150}
+        - {order_month: '2023-12-01', market_segment: BUILDING, total_revenue: 25}
+        - {order_month: '2024-01-01', market_segment: AUTOMOBILE, total_revenue: 75}
+
+  - name: monthly_sales_returns_no_rows_for_empty_input
+    description: Produces no aggregate rows when the upstream fact model is empty.
+    model: monthly_sales
+    given:
+      - input: ref('fct_orders')
+        rows: []
+    expect:
+      rows: []
