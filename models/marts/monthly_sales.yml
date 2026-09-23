@@ -3,8 +3,10 @@ models:
   - name: monthly_sales
     columns:
       - name: order_month
+        description: test description
         tests:
           - not_null
       - name: total_revenue
+        description: test to tatal revenue description
         tests:
           - not_null
