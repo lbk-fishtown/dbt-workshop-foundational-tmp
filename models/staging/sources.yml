@@ -1,7 +1,7 @@
 sources:
   - name: tpch
     database: raw
-    schema: tpch
+    schema: tpch_sf001
     tables:
       - name: orders
         description: "One record per order"
