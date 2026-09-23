@@ -1,0 +1,51 @@
+models:
+  - name: top_50_part_margins
+    description: >-
+      The 50 parts with the highest total potential margin across available
+      supplier inventory. One row per part, ranked by total margin dollars and
+      also ranked independently by inventory-weighted profit margin percentage.
+    columns:
+      - name: part_key
+        description: The unique identifier for the part.
+        data_tests:
+          - not_null
+          - unique
+      - name: part_name
+        description: The name of the part.
+      - name: manufacturer
+        description: The part manufacturer.
+      - name: brand
+        description: The part brand.
+      - name: part_type
+        description: The part type.
+      - name: part_size
+        description: The part size.
+      - name: container
+        description: The container type used for the part.
+      - name: retail_price
+        description: The retail price per unit.
+      - name: supplier_count
+        description: The number of suppliers carrying the part.
+      - name: available_quantity
+        description: The total quantity available across suppliers.
+      - name: weighted_average_supply_cost
+        description: The supply cost per unit weighted by available quantity.
+      - name: potential_revenue
+        description: Retail price multiplied by total available quantity.
+      - name: inventory_cost
+        description: Total cost of the available supplier inventory.
+      - name: total_margin
+        description: Potential revenue minus inventory cost.
+        data_tests:
+          - not_null
+      - name: profit_margin_percentage
+        description: Total margin divided by potential revenue, expressed as a percentage.
+      - name: total_margin_rank
+        description: Part rank by total margin dollars, where 1 is highest.
+        data_tests:
+          - not_null
+          - unique
+      - name: profit_margin_rank
+        description: Part rank across all parts by inventory-weighted margin percentage.
+        data_tests:
+          - not_null
