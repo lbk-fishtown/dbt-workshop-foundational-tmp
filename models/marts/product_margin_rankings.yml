@@ -1,0 +1,33 @@
+models:
+  - name: product_margin_rankings
+    description: >-
+      Products ranked by per-unit and total potential margin. One row per part
+      appearing in the top 50 for either margin measure.
+    columns:
+      - name: part_key
+        description: Unique identifier for the part.
+        data_tests:
+          - unique
+          - not_null
+      - name: part_name
+        description: Business name of the part.
+      - name: manufacturer
+        description: Manufacturer responsible for the part.
+      - name: brand
+        description: Brand under which the part is sold.
+      - name: part_type
+        description: Product category and characteristics assigned to the part.
+      - name: unit_retail_price
+        description: Retail selling price for one unit of the part.
+      - name: unit_cost
+        description: Average supplier cost per unit, weighted by available quantity.
+      - name: total_quantity
+        description: Total quantity of the part available across suppliers.
+      - name: unit_margin
+        description: Potential margin earned on one unit at the retail price.
+      - name: total_margin
+        description: Potential margin across all currently available units.
+      - name: unit_margin_rank
+        description: Product position when ranked from highest to lowest unit margin.
+      - name: total_margin_rank
+        description: Product position when ranked from highest to lowest total margin.
