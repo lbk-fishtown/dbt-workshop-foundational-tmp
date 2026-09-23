@@ -1,0 +1,190 @@
+models:
+  - name: margin_parts
+    description: >
+      Top 50 parts ranked by total inventory margin. The model has one row per part
+      and combines all supplier inventory for that part. Unit cost is weighted by
+      available quantity, unit margin is retail price less weighted average unit cost,
+      and total margin is unit margin multiplied by total available quantity.
+    columns:
+      - name: part_key
+        description: Primary key for the part.
+        data_tests:
+          - unique
+          - not_null
+
+      - name: part_name
+        description: Descriptive name of the part.
+
+      - name: manufacturer
+        description: Manufacturer associated with the part.
+
+      - name: brand
+        description: Brand associated with the part.
+
+      - name: part_type
+        description: Product type assigned to the part.
+
+      - name: part_size
+        description: Size assigned to the part.
+
+      - name: container
+        description: Container type used for the part.
+
+      - name: retail_price
+        description: Retail price per unit of the part.
+        data_tests:
+          - not_null
+
+      - name: supplier_count
+        description: Number of distinct suppliers carrying the part.
+        data_tests:
+          - not_null
+
+      - name: total_quantity
+        description: Total available quantity summed across all suppliers for the part.
+        data_tests:
+          - not_null
+
+      - name: weighted_average_unit_cost
+        description: >
+          Quantity-weighted average supplier cost per unit, calculated as total
+          inventory cost divided by total available quantity.
+        data_tests:
+          - not_null
+
+      - name: unit_margin
+        description: >
+          Margin per unit, calculated as retail price less the quantity-weighted
+          average unit cost.
+        data_tests:
+          - not_null
+
+      - name: total_margin
+        description: Unit margin multiplied by total available quantity.
+        data_tests:
+          - not_null
+
+      - name: unit_margin_rank
+        description: >
+          Dense rank of the part's unit margin across all supplied parts, ordered
+          from highest to lowest. Tied unit margins share the same rank.
+        data_tests:
+          - not_null
+
+      - name: total_margin_rank
+        description: >
+          Deterministic row number by total margin descending, with part key used
+          as the tie-breaker. Only ranks 1 through 50 are retained.
+        data_tests:
+          - unique
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                  - 8
+                  - 9
+                  - 10
+                  - 11
+                  - 12
+                  - 13
+                  - 14
+                  - 15
+                  - 16
+                  - 17
+                  - 18
+                  - 19
+                  - 20
+                  - 21
+                  - 22
+                  - 23
+                  - 24
+                  - 25
+                  - 26
+                  - 27
+                  - 28
+                  - 29
+                  - 30
+                  - 31
+                  - 32
+                  - 33
+                  - 34
+                  - 35
+                  - 36
+                  - 37
+                  - 38
+                  - 39
+                  - 40
+                  - 41
+                  - 42
+                  - 43
+                  - 44
+                  - 45
+                  - 46
+                  - 47
+                  - 48
+                  - 49
+                  - 50
+                quote: false
+
+unit_tests:
+  - name: margin_parts_calculates_weighted_margins_and_ranks
+    description: >
+      Validates quantity-weighted supplier costs, aggregation to one row per part,
+      different unit-versus-total margin leaders, dense-rank ties, and deterministic
+      total-margin tie-breaking by part key.
+    model: margin_parts
+    given:
+      - input: ref('stg_tpch__part')
+        rows:
+          - {p_partkey: 1, p_name: Part 1, p_retailprice: 100}
+          - {p_partkey: 2, p_name: Part 2, p_retailprice: 100}
+          - {p_partkey: 3, p_name: Part 3, p_retailprice: 100}
+          - {p_partkey: 4, p_name: Part 4, p_retailprice: 100}
+      - input: ref('stg_tpch__partsupp')
+        rows:
+          - {ps_partkey: 1, ps_suppkey: 11, ps_availqty: 10, ps_supplycost: 60}
+          - {ps_partkey: 1, ps_suppkey: 12, ps_availqty: 30, ps_supplycost: 80}
+          - {ps_partkey: 2, ps_suppkey: 21, ps_availqty: 10, ps_supplycost: 70}
+          - {ps_partkey: 3, ps_suppkey: 31, ps_availqty: 10, ps_supplycost: 90}
+          - {ps_partkey: 4, ps_suppkey: 41, ps_availqty: 10, ps_supplycost: 90}
+    expect:
+      rows:
+        - {part_key: 1, supplier_count: 2, total_quantity: 40, weighted_average_unit_cost: 75, unit_margin: 25, total_margin: 1000, unit_margin_rank: 2, total_margin_rank: 1}
+        - {part_key: 2, supplier_count: 1, total_quantity: 10, weighted_average_unit_cost: 70, unit_margin: 30, total_margin: 300, unit_margin_rank: 1, total_margin_rank: 2}
+        - {part_key: 3, supplier_count: 1, total_quantity: 10, weighted_average_unit_cost: 90, unit_margin: 10, total_margin: 100, unit_margin_rank: 3, total_margin_rank: 3}
+        - {part_key: 4, supplier_count: 1, total_quantity: 10, weighted_average_unit_cost: 90, unit_margin: 10, total_margin: 100, unit_margin_rank: 3, total_margin_rank: 4}
+
+  - name: margin_parts_excludes_parts_without_suppliers
+    description: >
+      Confirms the inner join excludes catalog parts that have no matching supplier
+      inventory while retaining and ranking matched parts.
+    model: margin_parts
+    given:
+      - input: ref('stg_tpch__part')
+        rows:
+          - {p_partkey: 1, p_name: Supplied Part, p_retailprice: 100}
+          - {p_partkey: 2, p_name: Unsupplied Part, p_retailprice: 200}
+      - input: ref('stg_tpch__partsupp')
+        rows:
+          - {ps_partkey: 1, ps_suppkey: 11, ps_availqty: 5, ps_supplycost: 80}
+    expect:
+      rows:
+        - {part_key: 1, supplier_count: 1, total_quantity: 5, unit_margin: 20, total_margin: 100, unit_margin_rank: 1, total_margin_rank: 1}
+
+  - name: margin_parts_returns_no_rows_for_empty_inputs
+    description: Produces no ranked rows when both upstream staging models are empty.
+    model: margin_parts
+    given:
+      - input: ref('stg_tpch__part')
+        rows: []
+      - input: ref('stg_tpch__partsupp')
+        rows: []
+    expect:
+      rows: []
