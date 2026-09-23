@@ -1,0 +1,10 @@
+version: 2
+models:
+  - name: monthly_sales
+    columns:
+      - name: order_month
+        tests:
+          - not_null
+      - name: total_revenue
+        tests:
+          - not_null
