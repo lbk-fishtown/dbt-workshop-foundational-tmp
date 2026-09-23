@@ -1,11 +1,16 @@
 sources:
   - name: tpch
+    description: TPCH source data used by the staging models.
     database: raw
     schema: tpch_sf001
     tables:
       - name: orders
-        description: "One record per order"
+        description: One record per order.
       - name: customer
-        description: "One record per customer"
+        description: One record per customer.
       - name: lineitem
-        description: "One record per line item within a single order (1 -> n)"
+        description: One record per line item within an order.
+      - name: part
+        description: One record per part.
+      - name: partsupp
+        description: One record per part and supplier combination.
