@@ -1,0 +1,71 @@
+models:
+  - name: top_50_part_margins
+    description: >-
+      The 50 parts with the highest potential total margin on available
+      inventory. Supplier-level costs and quantities are aggregated to one row
+      per part. Unit margin uses a quantity-weighted average supply cost, while
+      total margin is the sum of unit margin multiplied by available quantity
+      across suppliers.
+    columns:
+      - name: part_key
+        description: Unique identifier for the part.
+        data_tests:
+          - unique
+          - not_null
+
+      - name: part_name
+        description: Name of the part.
+        data_tests:
+          - not_null
+
+      - name: manufacturer
+        description: Manufacturer of the part.
+
+      - name: brand
+        description: Brand of the part.
+
+      - name: part_type
+        description: Type or category of the part.
+
+      - name: unit_retail_price
+        description: Retail price for one unit of the part.
+        data_tests:
+          - not_null
+
+      - name: weighted_average_unit_cost
+        description: >-
+          Supply cost per unit, weighted by each supplier's available quantity.
+        data_tests:
+          - not_null
+
+      - name: unit_margin
+        description: >-
+          Potential margin per unit, calculated as unit retail price minus the
+          quantity-weighted average unit cost.
+        data_tests:
+          - not_null
+
+      - name: total_quantity
+        description: Total available quantity summed across all suppliers.
+        data_tests:
+          - not_null
+
+      - name: total_margin
+        description: >-
+          Potential margin on available inventory, calculated by summing unit
+          margin multiplied by available quantity across suppliers.
+        data_tests:
+          - not_null
+
+      - name: unit_margin_rank
+        description: Descending rank by unit margin across all parts.
+        data_tests:
+          - unique
+          - not_null
+
+      - name: total_margin_rank
+        description: >-
+          Descending rank by total margin. Only ranks 1 through 50 are retained.
+        data_tests:
+          - unique
+          - not_null
