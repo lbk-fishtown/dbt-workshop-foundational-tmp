@@ -1,0 +1,46 @@
+models:
+  - name: req
+    description: >-
+      Top 50 parts by estimated total inventory margin across suppliers. Supply
+      cost is weighted by available quantity, so unit margin represents the
+      weighted margin per available unit rather than a simple supplier average.
+    columns:
+      - name: part_key
+        description: Unique identifier for the part.
+        data_tests:
+          - unique
+          - not_null
+      - name: part_name
+        description: Name of the part.
+      - name: manufacturer
+        description: Manufacturer of the part.
+      - name: brand
+        description: Brand of the part.
+      - name: part_type
+        description: Type classification of the part.
+      - name: retail_price
+        description: Retail price per unit of the part.
+      - name: total_quantity
+        description: Total available quantity across all suppliers for the part.
+        data_tests:
+          - not_null
+      - name: weighted_average_supply_cost
+        description: Supply cost per unit weighted by each supplier's available quantity.
+      - name: unit_margin
+        description: Retail price minus the quantity-weighted average supply cost.
+        data_tests:
+          - not_null
+      - name: total_margin
+        description: Sum of unit margin multiplied by available quantity across suppliers.
+        data_tests:
+          - not_null
+      - name: unit_margin_rank
+        description: Unique descending rank by weighted unit margin, with part key breaking ties.
+        data_tests:
+          - unique
+          - not_null
+      - name: total_margin_rank
+        description: Unique descending rank by total margin, with part key breaking ties; limited to 50.
+        data_tests:
+          - unique
+          - not_null
